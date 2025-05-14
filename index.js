@@ -3,6 +3,13 @@ const cors = require('cors');
 require('dotenv').config();
 const { connectDb1, connectDb2,connectDb3 ,connectDb4,connectDb5} = require('./utils/getConnection'); // Import connection functions
 const userRoutes = require('./routes/user');
+const initializeBot = require('./BOT/bot');
+
+initializeBot({
+    mongoUri: process.env.MONGO_URI2,
+    botToken: process.env.BOT_TOKEN
+});
+
 
 const app = express();
 

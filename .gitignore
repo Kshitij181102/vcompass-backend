@@ -1,0 +1,20 @@
+# Node modules
+node_modules/
+
+# Log files
+*.log
+
+# Environment variables
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor settings
+.vscode/
+.idea/
+
+# Data or config files (if sensitive or not meant for tracking)
+*.xlsx
+*.json

@@ -1,5 +1,5 @@
 const User=require('../models/User')
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const joi=require('joi');
 const newMail=require('../utils//mailNew')
 const register=async(req,res,next)=>{
