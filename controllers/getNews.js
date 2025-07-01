@@ -1,16 +1,47 @@
 const News=require('../models/News')
 const getNews=async(req,res)=>{
    
-      try {
-         // Fetch all 'matter' fields from News documents
-    const matterList = await News.find({}, 'matter').exec();
+     try {
+    const { category, featured, limit = 10, page = 1 } = req.query;
     
-    // Extract and clean the 'matter' content for each document
-    const matterArray = matterList.map(item => item.matter.trim());
-
-    res.json(matterArray);
-      } catch (error) {
-        res.status(500).json({ message: "Error fetching news", error });
+    let filter = { status: 'published' };
+    
+    if (category) {
+      filter.category = category;
+    }
+    
+    if (featured === 'true') {
+      filter.featured = true;
+    }
+    
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    
+    const news = await News.find(filter)
+      .sort({ publishDate: -1 })
+      .limit(parseInt(limit))
+      .skip(skip)
+      .lean();
+    
+    const total = await News.countDocuments(filter);
+    
+    res.status(200).json({
+      success: true,
+      data: news,
+      pagination: {
+        currentPage: parseInt(page),
+        totalPages: Math.ceil(total / parseInt(limit)),
+        totalItems: total,
+        hasNext: skip + news.length < total,
+        hasPrev: parseInt(page) > 1
       }
+    });
+  } catch (error) {
+    console.error('Error fetching news:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch news',
+      error: error.message
+    });
+  }
 }
 module.exports=getNews;
