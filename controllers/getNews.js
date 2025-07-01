@@ -1,13 +1,14 @@
-const News=require('../models/News')
-const getNews=async(req,res)=>{
-   
-     try {
+const News = require('../models/News');
+
+const getNews = async (req, res) => {
+  try {
     const { category, featured, limit = 10, page = 1 } = req.query;
     
     let filter = { status: 'published' };
     
-    if (category) {
-      filter.category = category;
+    // Handle category filtering
+    if (category && category !== 'all') {
+      filter.category = { $regex: new RegExp(category, 'i') };
     }
     
     if (featured === 'true') {
@@ -15,14 +16,19 @@ const getNews=async(req,res)=>{
     }
     
     const skip = (parseInt(page) - 1) * parseInt(limit);
-    
+    console.log("News filter:", filter);
+    console.log("Pagination - Skip:", skip, "Limit:", limit);
+
+    // Apply the filter, limit, and skip properly
     const news = await News.find(filter)
-      .sort({ publishDate: -1 })
+      .sort({ publishDate: -1, createdAt: -1 }) // Sort by publish date (newest first)
       .limit(parseInt(limit))
       .skip(skip)
       .lean();
     
     const total = await News.countDocuments(filter);
+    
+    console.log("Found news:", news.length, "Total:", total);
     
     res.status(200).json({
       success: true,
@@ -43,5 +49,6 @@ const getNews=async(req,res)=>{
       error: error.message
     });
   }
-}
-module.exports=getNews;
+};
+
+module.exports = getNews;

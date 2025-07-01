@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-
+const { connectDb4 } = require("../utils/getConnection");
 const newsSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -52,5 +52,5 @@ const newsSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
-
-module.exports = mongoose.model('News', newsSchema);
+const News = connectDb4().model("News", newsSchema);
+module.exports = News;

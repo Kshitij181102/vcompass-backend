@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-
+const { connectDb5 } = require("../utils/getConnection");
 const posterSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -59,5 +59,5 @@ const posterSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
-
-module.exports = mongoose.model('Poster', posterSchema);
+const Poster = connectDb5().model("Poster", posterSchema);
+module.exports =Poster;
