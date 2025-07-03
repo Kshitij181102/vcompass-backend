@@ -260,6 +260,7 @@ const handleBooking = async (mentorId, menteeId, scheduleTime) => {
 };
 
 // Function to remove mentee from booking
+// Function to remove mentee from booking and delete entry if no mentees are left
 const removeMenteeFromBooking = async (mentorId, menteeId) => {
     try {
         const booking = await Booking.findOne({
@@ -278,16 +279,23 @@ const removeMenteeFromBooking = async (mentorId, menteeId) => {
 
         // Remove mentee from the array
         booking.menteeIds = booking.menteeIds.filter(id => id !== menteeId);
+
+        // Update the updatedAt field
         booking.updatedAt = new Date();
 
-        // If no mentees left, deactivate the booking
         if (booking.menteeIds.length === 0) {
-            booking.isActive = false;
-            console.log('No mentees left, deactivating booking');
+            // No mentees left, delete the booking entry
+            await Booking.deleteOne({ _id: booking._id });
+            console.log('No mentees left, booking entry deleted');
+            return {
+                success: true,
+                message: 'Successfully removed from booking and booking entry deleted',
+                booking: null
+            };
         }
 
         const updatedBooking = await booking.save();
-        
+
         return {
             success: true,
             message: 'Successfully removed from booking',
